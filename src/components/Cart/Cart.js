@@ -7,6 +7,8 @@ import Checkout from './Checkout';
 
 const Cart = (props) => {
     const [isCheckout, setIsCheckout] = useState(false);
+    const [isSubmiting, setIsSubmiting] = useState(false);
+    const [isSubmited, setIsSubmited] = useState(false);
     const cartCtx = useContext(CartContext);
 
     const totalAmount = cartCtx.totalAmount.toFixed(2);
@@ -25,8 +27,8 @@ const Cart = (props) => {
         setIsCheckout(true);
     }
 
-    const submitOrderHandler = (userData) => {
-        console.log(userData);
+    const submitOrderHandler = async (userData) => {
+        setIsSubmiting(true);
         fetch("https://react-http-c28cc-default-rtdb.firebaseio.com/orders.json", {
             method: "POST",
             body: JSON.stringify({
@@ -34,6 +36,10 @@ const Cart = (props) => {
                 orderedItems: cartCtx.items
             })
         });
+        console.log(userData);
+        setIsSubmiting(false);
+        setIsSubmited(true);
+        cartCtx.clearCart();
     };
 
     const cartitems = (<ul className={classes["cart-items"]}>
@@ -51,8 +57,8 @@ const Cart = (props) => {
         })}
     </ul>);
 
-    return (
-        <Modal onClose={props.onClose}>
+    const modalContent = (
+        <>
             {cartitems}
             <div className={classes.total}>
                 <span>Total Amount</span>
@@ -64,6 +70,24 @@ const Cart = (props) => {
                     <button className={classes["button--alt"]} onClick={props.onClose}>Close</button>
                     {cartItemsLen && <button onClick={orderHandler} className={classes.button}>Order</button>}
                 </div>}
+        </>
+    );
+
+    const isSubmitingModelContent = <p>Sending request Waiting ...</p>;
+    const didSubmitedModelContent = (
+        <>
+            <p>Successfully Sent the order ...</p>
+            <div className={classes.actions}>
+                <button className={classes.button} onClick={props.onClose}>Close</button>
+            </div>
+        </>
+    );
+
+    return (
+        <Modal onClose={props.onClose}>
+            {!isSubmiting && !isSubmited && modalContent}
+            {isSubmiting && isSubmitingModelContent}
+            {!isSubmiting && isSubmited && didSubmitedModelContent}
         </Modal>
     )
 }
