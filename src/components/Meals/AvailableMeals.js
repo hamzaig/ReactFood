@@ -35,11 +35,20 @@ const DUMMY_MEALS = [
 const AvailableMeals = () => {
     const [meals, setMeals] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [httpError, setHttpError] = useState();
+
+
     useEffect(() => {
         setIsLoading(true);
         const fetchMeals = async () => {
-            const response = await fetch("https://react-http-c28cc-default-rtdb.firebaseio.com/meals.json");
+            const response = await fetch("https://react-http-c28cc-default-rtdb.firebaseio.com/meals.jso");
+
+            if (!response.ok) {
+                throw new Error("Something went wrong");
+            }
+
             const responseData = await response.json();
+
 
             const loadedMeals = [];
             for (const key in responseData) {
@@ -53,12 +62,22 @@ const AvailableMeals = () => {
             setMeals(loadedMeals)
             setIsLoading(false);
         };
-        fetchMeals();
+
+        fetchMeals().catch(error => {
+            setIsLoading(false);
+            setHttpError(error.message);
+        })
+
     }, [])
 
     if (isLoading) {
         return (<section className={classes.mealsLoading}>
             <p>Loading...</p>
+        </section>);
+    } else if (httpError) {
+        alert("hello");
+        return (<section className={classes.mealsError}>
+            <p>{httpError}</p>
         </section>);
     }
 
