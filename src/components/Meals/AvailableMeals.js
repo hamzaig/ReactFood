@@ -41,7 +41,7 @@ const AvailableMeals = () => {
     useEffect(() => {
         setIsLoading(true);
         const fetchMeals = async () => {
-            const response = await fetch("https://react-http-c28cc-default-rtdb.firebaseio.com/meals.jso");
+            const response = await fetch("https://react-http-c28cc-default-rtdb.firebaseio.com/meals.json");
 
             if (!response.ok) {
                 throw new Error("Something went wrong");
@@ -75,7 +75,6 @@ const AvailableMeals = () => {
             <p>Loading...</p>
         </section>);
     } else if (httpError) {
-        alert("hello");
         return (<section className={classes.mealsError}>
             <p>{httpError}</p>
         </section>);
